@@ -189,7 +189,7 @@ export default function Home() {
             <div className="flex flex-col gap-4 sm:gap-6">
               <div className="space-y-3 sm:space-y-4">
                 <h2 className="text-xs sm:text-sm font-semibold text-zinc-700 uppercase tracking-wide">Live Preview</h2>
-                <div className="bg-gradient-to-br from-zinc-100 to-zinc-50 backdrop-blur-xl rounded-2xl sm:rounded-3xl overflow-hidden border border-zinc-200 shadow-2xl shadow-zinc-900/10 hover:shadow-zinc-900/20 transition-shadow duration-300">
+                <div className="bg-gradient-to-br from-zinc-100 to-zinc-50 backdrop-blur-xl rounded-2xl sm:rounded-3xl overflow-hidden border border-zinc-200 shadow-2xl shadow-zinc-900/10 hover:shadow-zinc-900/20 transition-shadow duration-300 [&_iframe]:touch-none [&_div]:touch-none" style={{ WebkitTouchCallout: "none" }}>
                   <Player
                     component={MyVideo}
                     inputProps={{ lines }}
@@ -200,8 +200,10 @@ export default function Home() {
                     style={{
                       width: "100%",
                       aspectRatio: "9/16",
+                      WebkitTouchCallout: "none",
                     }}
                     controls
+                    allowFullscreen
                   />
                 </div>
               </div>
