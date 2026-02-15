@@ -69,11 +69,12 @@ export default function Home() {
 
   // Handle textarea keyboard shortcuts
   const handleScriptKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-    if (e.key === "Enter" && !e.shiftKey) {
+    if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) {
       e.preventDefault();
       handleScriptSubmit();
     }
-    // Shift+Enter creates a new line (default browser behavior)
+    // Enter creates a new line (default browser behavior)
+    // Ctrl+Enter (or Cmd+Enter on Mac) submits
   };
 
   // Handle like/dislike
@@ -214,7 +215,7 @@ export default function Home() {
                   </button>
                 </div>
                 <p className="text-xs text-zinc-500 mt-2">
-                  Press <kbd className="px-2 py-1 bg-zinc-200 rounded text-zinc-700 font-mono text-xs">Enter</kbd> to submit or <kbd className="px-2 py-1 bg-zinc-200 rounded text-zinc-700 font-mono text-xs">Shift + Enter</kbd> for new line
+                  Press <kbd className="px-2 py-1 bg-zinc-200 rounded text-zinc-700 font-mono text-xs">Ctrl + Enter</kbd> to submit or use the button. <kbd className="px-2 py-1 bg-zinc-200 rounded text-zinc-700 font-mono text-xs">Enter</kbd> creates a new line.
                 </p>
               </div>
 
