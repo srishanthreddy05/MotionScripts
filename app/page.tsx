@@ -11,6 +11,7 @@ const FPS = 30;
 
 export default function Home() {
   const [script, setScript] = useState("");
+  const [isSubmittingScript, setIsSubmittingScript] = useState(false);
 
   // Feedback state
   const [feedback, setFeedback] = useState("");
@@ -45,10 +46,34 @@ export default function Home() {
     saveEvent("visit");
   }, []);
 
-  // Handle script change
+  // Handle script change - only update state, no event
   const handleScriptChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setScript(e.target.value);
-    saveEvent("script_paste");
+  };
+
+  // Handle script submission
+  const handleScriptSubmit = async () => {
+    if (!script.trim()) return;
+    
+    setIsSubmittingScript(true);
+    try {
+      await saveEvent("script_paste");
+      // Add 2 second processing delay
+      await new Promise(resolve => setTimeout(resolve, 2000));
+    } catch (error) {
+      console.error("Failed to save script paste event:", error);
+    } finally {
+      setIsSubmittingScript(false);
+    }
+  };
+
+  // Handle textarea keyboard shortcuts
+  const handleScriptKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      handleScriptSubmit();
+    }
+    // Shift+Enter creates a new line (default browser behavior)
   };
 
   // Handle like/dislike
@@ -163,13 +188,34 @@ export default function Home() {
                 <label htmlFor="script" className="block text-xs sm:text-sm font-semibold text-zinc-700 uppercase tracking-wide">
                   Your Script
                 </label>
-                <textarea
-                  id="script"
-                  value={script}
-                  onChange={handleScriptChange}
-                  className="w-full h-[300px] sm:h-[400px] p-4 sm:p-6 bg-white backdrop-blur-xl border border-zinc-200 rounded-2xl resize-none focus:outline-none focus:ring-2 focus:ring-zinc-300 focus:border-zinc-300 text-sm sm:text-base leading-relaxed transition-all duration-200 placeholder:text-zinc-400 hover:border-zinc-300 text-zinc-900"
-                  placeholder="Paste your script here. One line per sentence."
-                />
+                <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
+                  <textarea
+                    id="script"
+                    value={script}
+                    onChange={handleScriptChange}
+                    onKeyDown={handleScriptKeyDown}
+                    className="flex-1 h-[300px] sm:h-[400px] p-4 sm:p-6 bg-white backdrop-blur-xl border border-zinc-200 rounded-lg sm:rounded-xl resize-none focus:outline-none focus:ring-2 focus:ring-zinc-300 focus:border-zinc-300 text-sm sm:text-base leading-relaxed transition-all duration-200 placeholder:text-zinc-400 hover:border-zinc-300 text-zinc-900 disabled:bg-zinc-50 disabled:text-zinc-400"
+                    placeholder="Paste your script here. One line per sentence."
+                    disabled={isSubmittingScript}
+                  />
+                  <button
+                    onClick={handleScriptSubmit}
+                    disabled={!script.trim() || isSubmittingScript}
+                    className="h-12 sm:h-auto sm:py-4 px-6 sm:px-8 bg-zinc-900 text-white font-bold rounded-lg text-sm sm:text-base whitespace-nowrap hover:bg-zinc-800 transition-all duration-200 disabled:bg-zinc-200 disabled:text-zinc-400 disabled:cursor-not-allowed shadow-lg shadow-zinc-900/10 hover:shadow-lg hover:shadow-zinc-900/20 hover:scale-[1.02] active:scale-[0.98]"
+                  >
+                    {isSubmittingScript ? (
+                      <span className="flex items-center justify-center gap-2">
+                        <span className="inline-block w-4 h-4 border-2 border-current border-r-transparent rounded-full animate-spin" />
+                        Submitting...
+                      </span>
+                    ) : (
+                      "Submit"
+                    )}
+                  </button>
+                </div>
+                <p className="text-xs text-zinc-500 mt-2">
+                  Press <kbd className="px-2 py-1 bg-zinc-200 rounded text-zinc-700 font-mono text-xs">Enter</kbd> to submit or <kbd className="px-2 py-1 bg-zinc-200 rounded text-zinc-700 font-mono text-xs">Shift + Enter</kbd> for new line
+                </p>
               </div>
 
               <div className="flex items-center gap-4 sm:gap-8 px-4 sm:px-6 py-4 sm:py-5 bg-gradient-to-br from-zinc-100 to-zinc-50 backdrop-blur-xl border border-zinc-200 rounded-xl sm:rounded-2xl shadow-lg">
